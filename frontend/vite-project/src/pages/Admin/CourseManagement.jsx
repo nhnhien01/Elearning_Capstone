@@ -49,7 +49,11 @@ const CourseManagement = () => {
     data.append("tenKhoaHoc", formData.tenKhoaHoc);
     data.append("moTa", formData.moTa);
     data.append("maDanhMuc", formData.maDanhMuc);
-    if (file) data.append("hinhAnh", file);
+    
+  
+    if (file) {
+      data.append("hinhAnh", file);
+    }
 
     try {
       if (editing) {
@@ -62,12 +66,12 @@ const CourseManagement = () => {
         });
       }
       setShowModal(false);
+      setFile(null); 
       fetchCourses();
     } catch (err) {
       alert(err.response?.data?.message || "Thao tác thất bại!");
     }
   };
-
   const handleDelete = async (maKhoaHoc) => {
     if (!window.confirm("Xác nhận xóa khóa học này?")) return;
     try {

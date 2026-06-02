@@ -76,16 +76,22 @@ const CourseDetail = () => {
       </Link>
 
       <div className="bg-white rounded-[2rem] border-2 border-gray-950 shadow-[8px_8px_0px_0px_rgba(3,7,18,1)] overflow-hidden grid grid-cols-1 md:grid-cols-5 gap-0">
-        <div className="md:col-span-2 relative bg-gray-950 min-h-[350px] flex items-center justify-center">
-          <img
-            src={
-              anhBia ||
-              "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=700"
-            }
-            alt={course.tenKhoaHoc}
-            className="w-full h-full object-cover"
-          />
-        </div>
+       <div className="md:col-span-2 relative bg-gray-950 min-h-[350px] flex items-center justify-center">
+  <img
+    src={
+      course.hinhAnh
+        ? (course.hinhAnh.startsWith("http")
+            ? course.hinhAnh
+            : `${import.meta.env.VITE_API_URL}/${course.hinhAnh.replace(/^\//, '')}`)
+        : "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=700"
+    }
+    alt={course.tenKhoaHoc}
+    className="w-full h-full object-cover"
+    onError={(e) => {
+      e.target.src = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=700";
+    }}
+  />
+</div>
 
         <div className="md:col-span-3 p-10 flex flex-col justify-center space-y-6">
           <span className="bg-amber-400 self-start px-4 py-1 text-[10px] font-black uppercase tracking-widest border-2 border-gray-950 rounded-full">
