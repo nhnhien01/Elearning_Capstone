@@ -138,7 +138,7 @@ const Footer = () => {
                   />
                 </svg>
                 <span className="text-gray-400">
-                  Trụ sở chính: Tầng 5, Toà nhà Astan, quận 1 TP. Hồ Chí Minh.
+                  Cơ sở chính: Tầng 5, Toà nhà Astan, quận 1 TP. Hồ Chí Minh.
                 </span>
               </li>
               <li className="flex items-center space-x-2">
