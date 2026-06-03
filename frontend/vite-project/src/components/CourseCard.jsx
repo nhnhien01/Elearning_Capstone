@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 const CourseCard = ({ course }) => {
  
   const imageUrl = course.hinhAnh 
-    ? (course.hinhAnh.startsWith('http') 
-        ? course.hinhAnh 
-        : `${import.meta.env.VITE_API_URL}/${course.hinhAnh.replace(/^\//, '')}`)
-    : 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500';
+  ? (course.hinhAnh.startsWith('http') 
+      ? course.hinhAnh 
+      : `${import.meta.env.VITE_API_URL}/uploads/${course.hinhAnh.replace(/^\//, '')}`)
+  : 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500';
 
   return (
     <Link 

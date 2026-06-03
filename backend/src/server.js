@@ -26,7 +26,7 @@ app.use(cors({
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.json({ limit: '50mb' }));
 
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static('D:\\Cybersoft\\Luna Academy\\backend\\uploads'));
 
 app.use('/api/QuanLyKhoaHoc', courseRoutes);
 app.use('/api/QuanLyNguoiDung', userRoutes);
