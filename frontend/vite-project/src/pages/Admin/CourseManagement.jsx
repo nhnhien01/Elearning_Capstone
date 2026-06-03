@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import axiosClient from "../../config/axiosClient";
 import { API_ENDPOINTS } from "../../constants/apiConfig";
@@ -8,6 +8,7 @@ const CourseManagement = () => {
   const [courses, setCourses] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
     maKhoaHoc: "",
     tenKhoaHoc: "",
@@ -16,6 +17,13 @@ const CourseManagement = () => {
   });
   const [file, setFile] = useState(null);
   const [editing, setEditing] = useState(false);
+
+  const filteredCourses = useMemo(() => {
+    return courses.filter((c) => 
+      c.maKhoaHoc.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      c.tenKhoaHoc.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [courses, searchTerm]);
 
   const fetchCourses = async () => {
     setLoading(true);
@@ -50,7 +58,6 @@ const CourseManagement = () => {
     data.append("moTa", formData.moTa);
     data.append("maDanhMuc", formData.maDanhMuc);
     
-  
     if (file) {
       data.append("hinhAnh", file);
     }
@@ -72,6 +79,7 @@ const CourseManagement = () => {
       alert(err.response?.data?.message || "Thao tác thất bại!");
     }
   };
+
   const handleDelete = async (maKhoaHoc) => {
     if (!window.confirm("Xác nhận xóa khóa học này?")) return;
     try {
@@ -101,21 +109,30 @@ const CourseManagement = () => {
             </p>
           </div>
         </div>
-        <button
-          onClick={() => {
-            setEditing(false);
-            setFormData({
-              maKhoaHoc: generateNextId("FrontEnd"),
-              tenKhoaHoc: "",
-              moTa: "",
-              maDanhMuc: "FrontEnd",
-            });
-            setShowModal(true);
-          }}
-          className="bg-gray-950 hover:bg-amber-500 hover:text-black hover:border-amber-500 text-amber-400 font-black px-6 py-3 rounded-xl text-xs uppercase tracking-wider border border-gray-950 transition-all shadow-md active:scale-[0.98] w-fit"
-        >
-          + THÊM KHÓA HỌC MỚI
-        </button>
+        <div className="flex flex-col sm:flex-row gap-4">
+            <input
+                type="text"
+                placeholder="Tìm kiếm..."
+                className="px-4 py-3 text-sm rounded-xl border-2 border-gray-950 font-bold focus:ring-4 focus:ring-amber-400 outline-none w-full sm:w-64"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button
+            onClick={() => {
+                setEditing(false);
+                setFormData({
+                maKhoaHoc: generateNextId("FrontEnd"),
+                tenKhoaHoc: "",
+                moTa: "",
+                maDanhMuc: "FrontEnd",
+                });
+                setShowModal(true);
+            }}
+            className="bg-gray-950 hover:bg-amber-500 hover:text-black hover:border-amber-500 text-amber-400 font-black px-6 py-3 rounded-xl text-xs uppercase tracking-wider border border-gray-950 transition-all shadow-md active:scale-[0.98] w-fit"
+            >
+            + THÊM KHÓA HỌC
+            </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-[1.5rem] border-2 border-gray-950 shadow-2xl shadow-gray-100 overflow-hidden">
@@ -136,14 +153,14 @@ const CourseManagement = () => {
                     Đang tải dữ liệu...
                   </td>
                 </tr>
-              ) : courses.length === 0 ? (
+              ) : filteredCourses.length === 0 ? (
                 <tr>
                   <td colSpan="4" className="p-16 text-center text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-50/50">
-                    Chưa có dữ liệu.
+                    Không tìm thấy dữ liệu.
                   </td>
                 </tr>
               ) : (
-                courses.map((c) => (
+                filteredCourses.map((c) => (
                   <tr key={c.maKhoaHoc} className="hover:bg-amber-50/20 transition-colors">
                     <td className="p-5 pl-8 font-black text-gray-950 tracking-wide">{c.maKhoaHoc}</td>
                     <td className="p-5 font-bold text-gray-950">{c.tenKhoaHoc}</td>

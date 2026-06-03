@@ -14,7 +14,7 @@ const CourseCard = ({ course }) => {
       to={`/course/${course.maKhoaHoc}`}
       className="group block bg-white rounded-[24px] overflow-hidden border-2 border-gray-950 shadow-[8px_8px_0px_0px_rgba(3,7,18,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-300 h-full flex flex-col"
     >
-      {/* Container ảnh cố định tỉ lệ */}
+     
       <div className="relative pt-[60%] overflow-hidden bg-gray-100">
         <img 
           src={imageUrl} 
