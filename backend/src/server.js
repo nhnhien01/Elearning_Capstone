@@ -26,7 +26,7 @@ app.use(cors({
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.json({ limit: '50mb' }));
 
-app.use('/uploads', express.static('D:\\Cybersoft\\Luna Academy\\backend\\uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/QuanLyKhoaHoc', courseRoutes);
 app.use('/api/QuanLyNguoiDung', userRoutes);
@@ -39,5 +39,5 @@ connectDB();
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Kết nối thành công cổng: ${PORT}`);
+  console.log(`Server running on port: ${PORT}`);
 });
