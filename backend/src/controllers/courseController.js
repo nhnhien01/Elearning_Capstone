@@ -1,5 +1,8 @@
 import { courseService } from '../services/courseService.js';
 import responseHandler from '../utils/responseHandler.js';
+import cloudinary from '../configs/cloudinary.js';
+
+
 
 export const getListCourse = async (req, res) => {
   try {
@@ -16,7 +19,6 @@ export const layDanhMucKhoaHoc = async (req, res) => {
     { maDanhMuc: 'BackEnd', tenDanhMuc: 'Lập trình Back End' },
     { maDanhMuc: 'FullStack', tenDanhMuc: 'Lập trình Full Stack' },
     { maDanhMuc: 'Mobile', tenDanhMuc: 'Lập trình Di Động' }
-
   ];
   return responseHandler.success(res, danhMuc, 'Lấy danh mục khóa học thành công!');
 };
@@ -45,7 +47,6 @@ export const layThongTinKhoaHoc = async (req, res) => {
   try {
     const { maKhoaHoc } = req.query;
     const course = await courseService.getDetailAndIncrementView(maKhoaHoc);
-    
     if (!course) {
       return responseHandler.error(res, 'Không tìm thấy thông tin khóa học yêu cầu!', 404);
     }
@@ -57,37 +58,44 @@ export const layThongTinKhoaHoc = async (req, res) => {
 
 export const themKhoaHoc = async (req, res) => {
   try {
-    const imagePath = req.file ? `/uploads/${req.file.filename}` : '';
+    let imageUrl = '';
+    if (req.file) {
+      const b64 = Buffer.from(req.file.buffer).toString("base64");
+      const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+      const result = await cloudinary.uploader.upload(dataURI, { folder: "luna-academy" });
+      imageUrl = result.secure_url;
+    }
     const newCourse = await courseService.create({
       ...req.body,
-      hinhAnh: imagePath,
+      hinhAnh: imageUrl,
       nguoiTao: { taiKhoan: req.user.taiKhoan, hoTen: req.user.hoTen }
     });
-
-    return responseHandler.success(res, newCourse, 'Thêm khóa học mới vào hệ thống thành công!', 201);
+    return responseHandler.success(res, newCourse, 'Thêm khóa học thành công!', 201);
   } catch (err) {
-    const statusCode = err.message.includes('tồn tại') ? 400 : 500;
-    return responseHandler.error(res, err.message, statusCode);
+    return responseHandler.error(res, err.message, 500);
   }
 };
 
 export const capNhatKhoaHoc = async (req, res) => {
   try {
-    const { maKhoaHoc } = req.body;
-    const updateData = { ...req.body };
     
+    const maKhoaHoc = req.body.maKhoaHoc || req.query.maKhoaHoc;
+    const updateData = { ...req.body };
+    delete updateData.maKhoaHoc;
+
     if (req.file) {
-      updateData.hinhAnh = `/uploads/${req.file.filename}`;
+      const b64 = Buffer.from(req.file.buffer).toString("base64");
+      const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+      const result = await cloudinary.uploader.upload(dataURI, { folder: "luna-academy" });
+      updateData.hinhAnh = result.secure_url;
     }
 
     const updatedCourse = await courseService.update(maKhoaHoc, updateData);
+    if (!updatedCourse) return responseHandler.error(res, 'Không tìm thấy khóa học', 404);
     
-    if (!updatedCourse) {
-      return responseHandler.error(res, 'Không tìm thấy khóa học nào phù hợp để cập nhật!', 404);
-    }
-
-    return responseHandler.success(res, updatedCourse, 'Cập nhật khóa học thành công!');
+    return responseHandler.success(res, updatedCourse, 'Cập nhật thành công!');
   } catch (err) {
+    console.error("LỖI:", err.message);
     return responseHandler.error(res, err.message, 500);
   }
 };
@@ -96,11 +104,10 @@ export const xoaKhoaHoc = async (req, res) => {
   try {
     const { maKhoaHoc } = req.query; 
     const deleted = await courseService.delete(maKhoaHoc);
-    
     if (!deleted) {
-      return responseHandler.error(res, 'Không tìm thấy khóa học cần xóa hoặc mã sai!', 404);
+      return responseHandler.error(res, 'Không tìm thấy khóa học cần xóa!', 404);
     }
-    return responseHandler.success(res, null, 'Xóa khóa học khỏi hệ thống thành công!');
+    return responseHandler.success(res, null, 'Xóa khóa học thành công!');
   } catch (err) {
     return responseHandler.error(res, err.message, 500);
   }

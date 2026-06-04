@@ -43,9 +43,9 @@ export const courseService = {
     return await Course.create(courseData);
   },
 
-  update: async (maKhoaHoc, updateData) => {
-    return await Course.findOneAndUpdate({ maKhoaHoc }, updateData, { new: true });
-  },
+ update: async (maKhoaHoc, updateData) => {
+  return await Course.findOneAndUpdate({ maKhoaHoc }, updateData, { returnDocument: 'after' });
+},
 
   delete: async (maKhoaHoc) => {
     return await Course.findOneAndDelete({ maKhoaHoc });
