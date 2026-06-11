@@ -2,6 +2,44 @@ import User from '../models/userModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Course from '../models/courseModel.js';
+import cloudinary from '../configs/cloudinary.js';
+
+export const uploadAvatar = async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ message: 'Không tìm thấy tệp tin!' });
+        
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'avatars'
+        });
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id, 
+            { hinhAnh: result.secure_url }, 
+            { new: true }
+        ).select('-matKhau');
+
+        res.status(200).json({ message: 'Upload thành công!', user: updatedUser });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+};
+
+export const uploadCV = async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ message: "Không có file" });
+        
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            resource_type: "raw",
+            folder: 'cvs'
+        });
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id, 
+            { linkCV: result.secure_url }, 
+            { new: true }
+        ).select('-matKhau');
+
+        res.status(200).json({ path: result.secure_url, user: updatedUser });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+};
 
 export const dangKy = async (req, res) => {
     try {
@@ -134,20 +172,3 @@ export const updateProfile = async (req, res) => {
     } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
-export const uploadAvatar = async (req, res) => {
-    try {
-        if (!req.file) return res.status(400).json({ message: 'Không tìm thấy tệp tin!' });
-        const imageUrl = `/uploads/${req.file.filename}`;
-        const updatedUser = await User.findByIdAndUpdate(req.user.id, { hinhAnh: imageUrl }, { new: true }).select('-matKhau');
-        res.status(200).json({ message: 'Upload thành công!', user: updatedUser });
-    } catch (err) { res.status(500).json({ error: err.message }); }
-};
-
-export const uploadCV = async (req, res) => {
-    try {
-        if (!req.file) return res.status(400).json({ message: "Không có file" });
-        const linkCV = `/uploads/${req.file.filename}`;
-        const updatedUser = await User.findByIdAndUpdate(req.user.id, { linkCV }, { new: true }).select('-matKhau');
-        res.status(200).json({ path: linkCV, user: updatedUser });
-    } catch (err) { res.status(500).json({ error: err.message }); }
-};

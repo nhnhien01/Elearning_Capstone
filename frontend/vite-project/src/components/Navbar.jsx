@@ -21,19 +21,26 @@ const Navbar = () => {
     const fetchUserData = async () => {
       if (user && user.maLoaiNguoiDung === "HV") {
         try {
-          const res = await axiosClient.post("/api/QuanLyNguoiDung/ThongTinTaiKhoan");
+          const res = await axiosClient.post(
+            "/api/QuanLyNguoiDung/ThongTinTaiKhoan",
+          );
           if (res.data && res.data.chiTietKhoaHocGhiDanh) {
-            const updatedUser = { ...user, chiTietKhoaHocGhiDanh: res.data.chiTietKhoaHocGhiDanh };
+            const updatedUser = {
+              ...user,
+              chiTietKhoaHocGhiDanh: res.data.chiTietKhoaHocGhiDanh,
+            };
             localStorage.setItem("user", JSON.stringify(updatedUser));
             setUser(updatedUser);
           }
-        } catch (err) {
-          console.error(err);
-        }
+        } catch (err) {}
       }
     };
 
-    if (user && user.maLoaiNguoiDung === "HV" && (!user.chiTietKhoaHocGhiDanh || user.chiTietKhoaHocGhiDanh.length === 0)) {
+    if (
+      user &&
+      user.maLoaiNguoiDung === "HV" &&
+      (!user.chiTietKhoaHocGhiDanh || user.chiTietKhoaHocGhiDanh.length === 0)
+    ) {
       fetchUserData();
     }
   }, [user?.taiKhoan, user?.chiTietKhoaHocGhiDanh?.length]);
@@ -47,20 +54,9 @@ const Navbar = () => {
 
   const getImageUrl = (path) => {
     if (!path) return null;
-    return path.startsWith("http") ? path : `http://localhost:5000${path.startsWith("/") ? "" : "/"}${path}`;
-  };
-
-  const firstCourseId = user?.chiTietKhoaHocGhiDanh?.[0]?.maKhoaHoc;
-
-  
-  const handleCourseNavigation = (e) => {
-    e.preventDefault();
-    if (firstCourseId) {
-      navigate(`/course-schedule/${firstCourseId}`);
-    } else {
-     
-      navigate("/course-schedule");
-    }
+    const baseUrl = "https://elearning-capstone.onrender.com";
+    const cleanPath = path.startsWith("/") ? path : `/${path}`;
+    return `${baseUrl}${cleanPath}`;
   };
 
   return (
@@ -76,27 +72,62 @@ const Navbar = () => {
             {user ? (
               <div className="flex items-center space-x-4">
                 {user.maLoaiNguoiDung === "GV" && (
-                  <Link to="/admin" className="bg-amber-400 hover:bg-amber-500 text-gray-950 px-4 py-2 border-2 border-amber-500 rounded-xl font-black text-xs tracking-widest transition-colors">Trang Admin</Link>
+                  <Link
+                    to="/admin"
+                    className="bg-amber-400 hover:bg-amber-500 text-gray-950 px-4 py-2 border-2 border-amber-500 rounded-xl font-black text-xs tracking-widest transition-colors"
+                  >
+                    Trang Admin
+                  </Link>
                 )}
                 {user.maLoaiNguoiDung === "NV" && (
-                  <Link to="/staff-tasks" className="text-amber-400 hover:text-white font-black text-xs uppercase tracking-wider transition-colors">Việc của tôi</Link>
+                  <Link
+                    to="/staff-tasks"
+                    className="text-amber-400 hover:text-white font-black text-xs uppercase tracking-wider transition-colors"
+                  >
+                    Việc của tôi
+                  </Link>
                 )}
-              
-                <Link to="/profile" className="flex items-center space-x-2 border-l-2 pl-4 border-gray-800">
+                <Link
+                  to="/profile"
+                  className="flex items-center space-x-2 border-l-2 pl-4 border-gray-800"
+                >
                   <img
-                    src={`${getImageUrl(user.hinhAnh)}?t=${Date.now()}`}
+                    src={
+                      user.hinhAnh
+                        ? getImageUrl(user.hinhAnh)
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.hoTen || "U")}`
+                    }
                     alt="Avatar"
                     className="w-8 h-8 rounded-lg object-cover border border-amber-400"
-                    onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.hoTen || "U")}`; }}
+                    onError={(e) => {
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.hoTen || "U")}`;
+                    }}
                   />
-                  <span className="text-amber-400 font-black hidden md:inline text-xs tracking-wide">{user.hoTen || user.taiKhoan}</span>
+                  <span className="text-amber-400 font-black hidden md:inline text-xs tracking-wide">
+                    {user.hoTen || user.taiKhoan}
+                  </span>
                 </Link>
-                <button onClick={handleLogout} className="border-2 border-gray-800 text-gray-400 hover:bg-red-950/40 hover:text-red-400 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider">Đăng Xuất</button>
+                <button
+                  onClick={handleLogout}
+                  className="border-2 border-gray-800 text-gray-400 hover:bg-red-950/40 hover:text-red-400 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider"
+                >
+                  Đăng Xuất
+                </button>
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link to="/login" className="text-gray-400 hover:text-amber-400 font-black text-xs uppercase tracking-wider">Đăng Nhập</Link>
-                <Link to="/register" className="bg-amber-400 text-gray-950 font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider">Đăng Ký</Link>
+                <Link
+                  to="/login"
+                  className="text-gray-400 hover:text-amber-400 font-black text-xs uppercase tracking-wider"
+                >
+                  Đăng Nhập
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-amber-400 text-gray-950 font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider"
+                >
+                  Đăng Ký
+                </Link>
               </div>
             )}
           </div>

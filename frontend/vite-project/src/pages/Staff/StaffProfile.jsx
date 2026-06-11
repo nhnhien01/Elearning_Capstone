@@ -10,6 +10,12 @@ const StaffProfile = () => {
   const [formData, setFormData] = useState({ hoTen: "", soDT: "", email: "", matKhau: "" });
   const [msg, setMsg] = useState({ type: "", text: "" });
 
+  const getAssetUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith("http")) return path;
+    return `https://elearning-capstone.onrender.com${path}`;
+  };
+
   const fetchStaffProfile = async () => {
     try {
       const data = await userService.getProfile();
@@ -78,7 +84,7 @@ const StaffProfile = () => {
         <div className="bg-white p-6 rounded-[2rem] border-[3px] border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
           <div className="relative group cursor-pointer mt-4" onClick={() => fileInputRef.current.click()}>
             <img
-              src={profile.hinhAnh ? `http://localhost:5000${profile.hinhAnh}?t=${new Date().getTime()}` : `https://ui-avatars.com/api/?name=${profile.hoTen}`}
+              src={profile.hinhAnh ? getAssetUrl(profile.hinhAnh) : `https://ui-avatars.com/api/?name=${profile.hoTen}`}
               className="w-32 h-32 rounded-3xl border-[3px] border-slate-900 shadow-xl object-cover group-hover:scale-105 transition-transform"
               alt="Avatar"
             />

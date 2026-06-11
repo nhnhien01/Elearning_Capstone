@@ -23,6 +23,12 @@ const UserProfile = () => {
     chungChi: "",
   });
 
+  const getAssetUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith("http")) return path;
+    return `https://elearning-capstone.onrender.com${path}`;
+  };
+
   const PREDEFINED_SCHOOLS = [
     "Đại học Bách Khoa Hà Nội",
     "Đại học Quốc gia Hà Nội",
@@ -57,12 +63,8 @@ const UserProfile = () => {
       const profileRes = await axiosClient.post("/api/QuanLyNguoiDung/ThongTinTaiKhoan");
       const resData = profileRes.data?.content || profileRes.data;
       const registeredCourses = resData?.mangKhoaHocGhiDanh || [];
-
-      console.log("Mảng khóa học sau khi sửa key:", registeredCourses);
       setMyCourses(registeredCourses);
-
     } catch (err) {
-      console.error("Lỗi lấy dữ liệu khóa học:", err);
       setMyCourses([]);
     }
   };
@@ -89,9 +91,7 @@ const UserProfile = () => {
       localStorage.setItem("user", JSON.stringify(newUser));
       setProfile(prev => ({ ...prev, hinhAnh: res.hinhAnh }));
       window.dispatchEvent(new Event("userUpdated"));
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   const handleCVChange = async (e) => {
@@ -140,7 +140,6 @@ const UserProfile = () => {
         <Link to="/" className="flex items-center gap-2 bg-white text-slate-900 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider border-2 border-slate-900 hover:bg-slate-50 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
           <Home size={16} /> Trang Chủ
         </Link>
-
         <button 
           onClick={handleGoToSchedule}
           className="flex items-center gap-2 bg-amber-400 text-slate-900 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider border-2 border-slate-900 hover:bg-amber-500 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
@@ -170,7 +169,7 @@ const UserProfile = () => {
           <div className="p-8 bg-white rounded-3xl border-2 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
             <div className="relative group cursor-pointer mb-6" onClick={() => fileInputRef.current.click()}>
               <img
-                src={profile.hinhAnh ? `http://localhost:5000${profile.hinhAnh}` : `https://ui-avatars.com/api/?name=${profile.hoTen}`}
+                src={profile.hinhAnh ? getAssetUrl(profile.hinhAnh) : `https://ui-avatars.com/api/?name=${profile.hoTen}`}
                 className="w-40 h-40 rounded-3xl object-cover border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                 alt="Avatar"
               />
@@ -199,54 +198,46 @@ const UserProfile = () => {
               </h2>
               
               {myCourses.length === 0 ? (
-  <div className="p-6 border-2 border-dashed border-slate-300 rounded-2xl text-center font-bold text-sm text-slate-400 uppercase">
-    Bạn chưa ghi danh vào khóa học nào.
-  </div>
-) : (
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-    {myCourses.map((course, index) => {
-      // Vì Backend đã trả về Object chi tiết, chúng ta bốc trực tiếp các thuộc tính ra
-      const currentMa = course.maKhoaHoc;
-      const currentTen = course.tenKhoaHoc || `Khóa học ${currentMa}`;
-      const currentHinhAnh = course.hinhAnh;
-
-      return (
-        <div 
-          key={currentMa + index} 
-          className="p-4 border-2 border-slate-900 bg-white rounded-2xl flex flex-col justify-between items-start gap-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 transition-all"
-        >
-          <div className="w-full">
-            {/* Hiển thị hình ảnh khóa học từ backend */}
-            {currentHinhAnh && (
-              <img 
-                src={`http://localhost:5000${currentHinhAnh}`} // Đảm bảo đúng port backend 5000 của bạn
-                alt={currentTen}
-                className="w-full h-36 object-cover rounded-xl border-2 border-slate-900 mb-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-              />
-            )}
-            <span className="text-[10px] font-black bg-slate-900 text-amber-400 px-2 py-0.5 rounded border border-slate-900 uppercase">
-              {currentMa}
-            </span>
-            <h4 className="font-black text-sm text-slate-900 mt-2 line-clamp-2">
-              {currentTen}
-            </h4>
-            <p className="text-xs text-slate-500 font-medium mt-1 line-clamp-2">
-              {course.moTa}
-            </p>
-          </div>
-          <Link
-            to={`/course-schedule/${currentMa}`}
-            className="w-full text-center py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase rounded-xl border-2 border-slate-900 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-          >
-            Vào Lớp Học Ngay
-          </Link>
-        </div>
-      );
-    })}
-  </div>
-)}
-               
-            
+                <div className="p-6 border-2 border-dashed border-slate-300 rounded-2xl text-center font-bold text-sm text-slate-400 uppercase">
+                  Bạn chưa ghi danh vào khóa học nào.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {myCourses.map((course, index) => {
+                    const currentMa = course.maKhoaHoc;
+                    const currentTen = course.tenKhoaHoc || `Khóa học ${currentMa}`;
+                    const currentHinhAnh = course.hinhAnh;
+                    return (
+                      <div key={currentMa + index} className="p-4 border-2 border-slate-900 bg-white rounded-2xl flex flex-col justify-between items-start gap-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 transition-all">
+                        <div className="w-full">
+                          {currentHinhAnh && (
+                            <img 
+                              src={getAssetUrl(currentHinhAnh)} 
+                              alt={currentTen}
+                              className="w-full h-36 object-cover rounded-xl border-2 border-slate-900 mb-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                            />
+                          )}
+                          <span className="text-[10px] font-black bg-slate-900 text-amber-400 px-2 py-0.5 rounded border border-slate-900 uppercase">
+                            {currentMa}
+                          </span>
+                          <h4 className="font-black text-sm text-slate-900 mt-2 line-clamp-2">
+                            {currentTen}
+                          </h4>
+                          <p className="text-xs text-slate-500 font-medium mt-1 line-clamp-2">
+                            {course.moTa}
+                          </p>
+                        </div>
+                        <Link
+                          to={`/course-schedule/${currentMa}`}
+                          className="w-full text-center py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase rounded-xl border-2 border-slate-900 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                        >
+                          Vào Lớp Học Ngay
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </section>
           )}
 
@@ -284,7 +275,7 @@ const UserProfile = () => {
                 {profile.linkCV && (
                   <div className="mb-4 p-4 bg-emerald-50 border-2 border-emerald-500 rounded-xl flex items-center justify-between">
                     <span className="font-bold text-emerald-800 text-sm truncate">{profile.linkCV.split("/").pop()}</span>
-                    <a href={`http://localhost:5000${profile.linkCV}`} target="_blank" rel="noopener noreferrer" className="text-xs font-black bg-emerald-500 text-white px-3 py-1 rounded-lg hover:bg-emerald-600">XEM CV</a>
+                    <a href={getAssetUrl(profile.linkCV)} target="_blank" rel="noopener noreferrer" className="text-xs font-black bg-emerald-500 text-white px-3 py-1 rounded-lg hover:bg-emerald-600">XEM CV</a>
                   </div>
                 )}
                 <div className="border-2 border-dashed border-slate-400 rounded-xl p-6 text-center hover:bg-slate-50 cursor-pointer transition-colors">
