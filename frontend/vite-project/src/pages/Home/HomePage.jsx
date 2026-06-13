@@ -59,23 +59,25 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-        <div className="space-y-8">
-          <h2 className="text-2xl font-black text-gray-950 uppercase tracking-tight">
-            Các danh mục đào tạo
-          </h2>
+        <div className="space-y-8 px-4 md:px-0">
+  <h2 className="text-xl md:text-2xl font-black text-gray-950 uppercase tracking-tight">
+    Các danh mục đào tạo
+  </h2>
 
-          <div className="flex flex-row gap-2 md:gap-4 overflow-x-auto pb-2">
-            {categories.map((cat) => (
-              <Link
-                key={cat.maDanhMuc}
-                to={`/category/${cat.maDanhMuc}`}
-                className="flex-1 min-w-[20%] bg-white border-2 border-gray-950 hover:bg-amber-400 rounded-xl p-3 md:p-6 text-center font-black text-[10px] md:text-sm text-gray-950 transition-all shadow-[2px_2px_0px_0px_rgba(3,7,18,1)] whitespace-nowrap"
-              >
-                {cat.tenDanhMuc}
-              </Link>
-            ))}
-          </div>
-        </div>
+ 
+  <div className="flex flex-row gap-3 overflow-x-auto pb-4 scrollbar-hide">
+    {categories.map((cat) => (
+      <Link
+        key={cat.maDanhMuc}
+        to={`/category/${cat.maDanhMuc}`}
+        
+        className="flex-shrink-0 min-w-[120px] md:min-w-[150px] bg-white border-2 border-gray-950 hover:bg-amber-400 rounded-xl p-3 md:p-6 text-center font-black text-xs md:text-sm text-gray-950 transition-all shadow-[2px_2px_0px_0px_rgba(3,7,18,1)] flex items-center justify-center leading-tight"
+      >
+        {cat.tenDanhMuc}
+      </Link>
+    ))}
+  </div>
+</div>
 
         <div className="space-y-8 pb-12">
           <div className="flex justify-between items-end">
