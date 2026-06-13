@@ -100,9 +100,7 @@ const Attendance = () => {
           </Link>
           <h2 className="text-3xl font-black uppercase">Xét Duyệt Ghi Danh</h2>
         </div>
-        <div className="bg-gray-950 text-amber-400 px-6 py-3 rounded-2xl font-black text-lg inline-block w-fit">
-          KHÓA HỌC: {currentMaKhoaHoc || "CHƯA CHỌN"}
-        </div>
+        
       </div>
 
       <div className="bg-white rounded-[1.5rem] border-2 border-gray-950 shadow-2xl overflow-hidden">
